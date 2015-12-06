@@ -1,0 +1,603 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+//registros
+FILE *arquivo;
+struct reg {
+    int renavan,NumCh,Ano;
+    char TipVec[50],Marca[50],Modelo[50],Proprietario[50],SitIpva[50],SitLic[50],SitDpvat[50],Seguro[50],Placa[50];
+}veiculos[5];
+
+struct reg2{
+    int NumTic;
+    char DadosCarro[200],DadosCond[200],DadosLoc[200],DataIn[200],HoraIn[200],TipoVeic[200],DataTerm[10],HoraTerm[5],CidadeEst[20];
+    float ValorHora;
+}estacionamento[5];
+
+struct CadCond { //mudancas amanda e lohana
+       struct reg veiculos;
+       struct reg2 estacionamento;
+       int cpf,telefone, num;
+       char EndComp[200],nome[100],cidade[40],estado[50], DataNasc[10], categoria[5], DataVenc[10];
+
+}CadCond[5];
+
+/*struct{
+       int num;
+       char categoria[5], DataVenc[10];
+}DadosHab[5];*/
+
+struct localidades {
+
+       int IdCal,IdPar;
+       char NomeRua[100],NomeBai[100],cidade[100];
+       int renavan,NumCh,Ano;
+
+}localidades[5];
+
+
+
+//fim registros
+//inicio funcoes
+void cadcond();
+void cadveic();
+void cadloc();
+void cadesta();
+int qtdveic();
+void verdte();
+void idplaca();
+int verhabven(int anoAtual);
+void sair();
+void valor(int *anoAtual);
+//fim funcoes
+
+int main(){
+
+
+    int escolha,soma;//escolha do menu
+    char iniciar;
+    system("color F0");
+    //int indhab = 0;//indice de habilitacao
+
+
+
+    do
+    {
+        printf("~~~~~~~~~~~~~~~~~~~~~~- PARQUIMETRO -~~~~~~~~~~~~~~~~~~~~~~      \n");
+                printf("Deseja iniciar? ( S ou N ) \n");
+                fflush(stdin);
+                scanf("%c", &iniciar);
+                iniciar = toupper(iniciar);
+                switch (iniciar) {
+                   case 'S':
+
+                       //excuta o programa
+                       do { //laco do menu
+
+                           printf("\n\n ----------------------- ");
+                           printf("\n - 1 - Cadastrar Condutor ");
+                           //printf("\n - 2 - Cadastrar Informacoes de Habilitacao ");
+                           printf("\n - 2 - Cadastrar Veiculo ");
+                           printf("\n - 3 - Cadastrar Localidade ");
+                           printf("\n - 4 - Cadastrar Estacionamento ");
+                           printf("\n - 5 - Pesquisar quantidade de veiculos em cidade ");
+                           printf("\n - 6 - Verificacao de Data e Estacionamento ");
+                           printf("\n - 7 - Identificacao de Placa/Condutor/Localidade ");
+                           printf("\n - 8 - Verificacao de Habilitacao Vencida ");
+                           printf("\n - 9 - sair \n Escolha uma opcao: ");
+
+                           //leitura da opcao
+
+                           do {
+                               scanf("%d", &escolha);
+                               escolha = toupper(escolha);
+                               fflush(stdin);
+
+                                 if ((escolha < 1) || (escolha > 9))
+                                     printf("Opcao invalida");
+
+
+
+
+                           }while ((escolha < 1) || (escolha > 12));
+
+
+
+                           switch (escolha) {
+                               //chamada das funcoes no menu
+                           case 1:  cadcond(); break;
+                           case 2:  cadveic(); break;
+                           case 3:  cadloc(); break;
+                           case 4:  cadesta(); break;
+                           case 5:{
+                               soma=qtdveic();
+                               printf("a quantidade de veiculos estacionados eh de :%d",soma);
+                           }break;
+                           case 6:  verdte(); break;
+                           case 7:  idplaca(); break;
+                           case 8:{
+                               int anoAtual;
+                               printf("Informe o ano atual\n");
+                               scanf("%d",&anoAtual);
+                               verhabven(anoAtual);
+                           } break;
+
+
+
+                       }
+                 }while(escolha!=9);
+                    return (0);
+                    //fim do programa
+                    break;
+             }
+         } while (iniciar != 'N');
+     return 0;
+} //fim int main
+
+void cadcond (){ //parte da Lohana em arquivos
+
+    int indcond = 0;
+    char op;
+
+
+    if((arquivo=fopen("teste","wb"))!=NULL){
+
+    printf("nao ocorreu erro durante a abertura do arquivo");
+
+    do {
+        printf("\n~~~~~~~~~~~~~~~~CADASTRO DE CONDUTORES~~~~~~~~~~~~~~~~ \n");
+        printf("Deseja inserir novo registro? [1(sim) ou 0(nao)] \n");
+        fflush(stdin);
+        scanf("%c", &op);
+
+
+        if (op == '1'){
+            if (indcond <5){
+                //cadastro de op??es
+                printf("Informe seu nome \n");
+                scanf ("%s", CadCond[indcond].nome);
+                printf("Informe seu cpf \n");
+                scanf("%d",&CadCond[indcond].cpf);
+                printf("Informe sua data de nascimento\n");
+                scanf ("%s", CadCond[indcond].DataNasc);
+                printf("Informe seu telefone\n");
+                scanf("%d",&CadCond[indcond].telefone);
+                printf("Informe sua cidade\n");
+                scanf ("%s", CadCond[indcond].cidade);
+                printf("Informe seu estado\n");
+                scanf ("%s", CadCond[indcond].estado);
+                printf("Informe seu endereco completo(bairro,rua,numero)\n");
+                scanf ("%s", CadCond[indcond].EndComp);
+                printf("Informe o numero da sua carteira de habilitacao\n");
+                fflush(stdin);
+                scanf("%d",&CadCond[indcond].num);
+                printf("Informe a data de vencimento da habilitacao\n");//Condicao de proibicao
+                fflush(stdin);
+                scanf ("%s", CadCond[indcond].DataVenc);
+                printf("Informe a categoria de sua habilitacao\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indcond].categoria);
+
+                system("cls");
+
+
+                fwrite(CadCond,sizeof(struct CadCond ),5,arquivo);
+                fclose(arquivo);
+
+                indcond = indcond + 1;
+            }else
+            {
+                printf("nao eh possivel cadastrar mais condutores\n");
+                op ='0';
+            }//fim da verificacao da quantidade de condutores cadastrados
+        }else{
+            if (op != '0' ){
+                printf("opcao invalida\n");
+            }
+            }
+
+    }while(op !='0');
+
+    }else
+
+    {
+     printf(" erro ao abrir o arquivo\n");
+      exit(1);
+    }
+
+}
+
+
+
+
+
+void cadveic (){ //parte da amanda em arquivos
+    char op;
+    int indvec = 0;
+
+     arquivo=fopen("teste","wb");
+     if(!arquivo){
+    printf("Nao foi possivel abrir o arquivo!\n\n");
+    exit(1);
+  }
+    else
+    {
+
+    printf("Arquivo aberto com sucesso!\n\n");
+
+
+    do {
+        printf("\n~~~~~~~~~~~~~~~~CADASTRO DE VEICULOS~~~~~~~~~~~~~~~~ \n");
+        printf("Deseja inserir novo registro? [1(sim) ou 0(nao)] \n");
+        fflush(stdin);
+        scanf("%c", &op);
+        op=toupper(op);
+        if (op == '1'){
+            if (indvec <5){
+                  //informacoes a serem cadastradas
+                printf("Informe o renavan\n");
+                scanf("%d",&CadCond[indvec].veiculos.renavan);
+                fflush(stdin);
+
+                printf("Informe o tipo do veiculo: (Moto, Carro ou Onibus)\n");
+                scanf ("%s", CadCond[indvec].veiculos.TipVec);
+                fflush(stdin);
+
+                printf("Informe o numero do chassi\n");
+                scanf("%d",&CadCond[indvec].veiculos.NumCh);
+                fflush(stdin);
+
+                printf("Informe o numero da placa\n");
+                scanf ("%s",CadCond[indvec].veiculos.Placa);
+                fflush(stdin);
+
+                printf("Informe o ano do veiculo\n");
+                scanf("%d",&CadCond[indvec].veiculos.Ano);
+                fflush(stdin);
+
+                printf("Informe a marca do veiculo\n");
+                scanf ("%s", CadCond[indvec].veiculos.Marca);
+                fflush(stdin);
+
+                printf("Informe o modelo\n");
+                scanf ("%s", CadCond[indvec].veiculos.Modelo);
+                fflush(stdin);
+
+
+                printf("Informe o proprietario\n");
+                scanf ("%s", CadCond[indvec].veiculos.Proprietario);
+                fflush(stdin);
+
+                printf("Informe a situacao do IPVA:\n");
+                scanf("%s",CadCond[indvec].veiculos.SitIpva);
+                fflush(stdin);
+
+                printf("Informe a situacao do  DPVAT: (pago ou atrasado)\n");
+                scanf("%s",CadCond[indvec].veiculos.SitDpvat);
+                fflush(stdin);
+
+                printf("Informe a situacao do lincenciamento:\n");
+                scanf("%s",CadCond[indvec].veiculos.SitLic);
+                fflush(stdin);
+                system("cls");
+                fwrite(CadCond,sizeof(struct CadCond ),5,arquivo);
+                fclose(arquivo);
+
+                indvec = indvec + 1;
+        }else
+            {
+                printf("\nnao eh possivel cadastrar mais veiculos\n");
+                op ='0';
+            }//fim da verifica??o da quantidade de veiculos cadastrados
+
+            }
+    }while(op !='0');
+ }
+
+}
+
+
+void cadloc (){ //parte da Lohana em arquivos
+    char op;
+    int indloc = 0;
+     arquivo=fopen("teste","wb");
+     if(arquivo==NULL){
+
+    printf("erro ao abrir arquivo\n");
+    exit(1);
+  }
+    else
+    {
+
+    printf("nao ocorreu erro durante a abertura do arquivo");
+
+    do {
+        printf("\n~~~~~~~~~~~~~~~~CADASTRO DE LOCALIDADES~~~~~~~~~~~~~~~~ \n");
+        printf("Deseja inserir novo registro? [1(sim) ou 0(nao)] \n");
+        fflush(stdin);
+        scanf("%c", &op);
+        op= toupper(op);
+        if (op == '1'){
+            if (indloc < 5){
+                  //informacoes a serem cadastradas
+                printf("Informe o numero de identificacao na calcada\n");
+                fflush(stdin);
+                scanf("%d",&localidades[indloc].IdCal);
+                printf("Informe o codigo de identificacao do parquimetro\n");
+                fflush(stdin);
+                scanf ("%d", &localidades[indloc].IdPar);
+                printf("Informe o nome da rua\n");
+                fflush(stdin);
+                scanf ("%s", &localidades[indloc].NomeRua);
+                fflush(stdin);
+                printf("Informe o nome do bairro\n");
+                fflush(stdin);
+                scanf ("%s", &localidades[indloc].NomeBai);
+                printf("Informe a cidade\n");
+                fflush(stdin);
+                scanf ("%s", &localidades[indloc].cidade);
+                system("cls");
+                fwrite(localidades,sizeof(struct localidades ),5,arquivo);
+                fclose(arquivo);
+                indloc = indloc + 1;
+        }else
+            {
+                printf("\nnao eh possivel cadastrar mais localidades\n");
+                op ='0';
+            }//fim da verifica??o da quantidade de veiculos cadastrados
+        }else{
+            if (op != '0' ){
+                printf("\nopcao invalida\n");
+            }
+            }
+    }while(op !='0');
+}
+
+}
+void cadesta (){ //parte da amanda em arquivos
+    int indest = 0;
+    char op;
+
+     arquivo=fopen("teste","wb");
+    if(!arquivo){
+    printf("Nao foi possivel abrir o arquivo!\n\n");
+    exit(1);
+  }
+    else
+    {
+
+    printf("Arquivo aberto com sucesso!\n\n");
+
+    do {
+        printf("\n~~~~~~~~~~~~~~~~CADASTRO DE ESTACIONAMENTO~~~~~~~~~~~~~~~~ \n");
+        printf("Deseja inserir novo registro? [1(sim) ou 0(nao)] \n");
+        fflush(stdin);
+        scanf("%c",&op);
+        op= toupper(op);
+        if (op == '1'){
+            if (indest <5){
+                  //informacoes a serem cadastradas
+                printf("Informe o numero do ticket\n");
+                fflush(stdin);
+                scanf("%d",&CadCond[indest].estacionamento.NumTic);
+                printf("Informe os dados do carro\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.DadosCarro);
+                printf("Informe os dados do condutor\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.DadosCond);
+                printf("Informe os dados da localidade\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.DadosLoc);
+                printf("Informe a cidade onde estacionou\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.CidadeEst);
+                printf("Informe a data de inicio\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.DataIn);
+                printf("Informe a hora de inicio\n");
+                fflush(stdin);
+                scanf ("%s",CadCond[indest].estacionamento.HoraIn);
+                printf("Informe o tipo do veiculo\n");
+                fflush(stdin);
+                scanf ("%s",CadCond[indest].estacionamento.TipoVeic);
+                printf("Informe a data de termino\n");
+                fflush(stdin);
+                scanf ("%s", CadCond[indest].estacionamento.DataTerm);
+                printf("Informe a hora de termino\n");
+                fflush(stdin);
+                scanf ("%s",CadCond[indest].estacionamento.HoraTerm);
+                printf("Informe o valor/hora\n");
+                fflush(stdin);
+                scanf("%f", &CadCond[indest].estacionamento.ValorHora);
+                system("cls");
+                fwrite(CadCond,sizeof(struct CadCond ),5,arquivo);
+                fclose(arquivo);
+
+                indest = indest + 1;
+        }else
+            {
+                printf("\nnao eh possivel cadastrar mais estacionamento\n");
+                op ='0';
+            }//fim da verificacao da quantidade de estacionamento cadastrados
+        }
+        else
+        {
+            if (op != '0'){
+                printf("\nopcao invalida\n");
+            }
+        }
+        }while(op !='0');
+    }
+
+}
+int qtdveic () //parte da lohana em arquivos
+{
+    char loc[200];
+    char dat[200];
+    int i,soma;
+    soma =0;
+
+     if((arquivo=fopen("teste","rb"))==NULL)
+     {
+        printf("erro ao abrir arquivo\n");
+        exit(1);
+     }
+     else
+     {
+
+        printf("nao ocorreu erro durante a abertura do arquivo\n\n");
+        fread(&localidades,sizeof(struct localidades),3,arquivo);
+        printf("Digite a localidade desejada\n");
+        scanf("%s",loc);
+        printf("Digite a data desejada \n");
+        scanf("%s",dat);
+        for (i=0; i<3; i++)
+        {
+            if (strcmp(CadCond[i].estacionamento.DadosLoc,loc) == 0)
+            {
+              if (strcmp(CadCond[i].estacionamento.DataIn,dat) == 0)
+                    soma ++;
+            }
+        }
+        fclose(arquivo);
+
+     }
+
+    return soma;
+
+}
+
+
+void verdte() //parte da amanda em arquivos e em passagem de parametros
+{
+    int anoAtual;//tirar dps e usar a referencia da funcao
+    //int indloc = 0; // tirar dps e usar a referencia da funcao
+
+
+        arquivo=fopen("teste","wb");
+        if(!arquivo){
+
+        printf("Nao foi possivel abrir o arquivo!\n\n");
+        exit(1);
+      }
+        else
+        {
+         printf("Arquivo aberto com sucesso!\n\n");
+
+        printf("Informe o ano atual\n");
+        scanf("%d",&anoAtual);
+        valor(&anoAtual);
+
+        }
+        fwrite(CadCond,sizeof(struct CadCond ),5,arquivo);
+        fclose(arquivo);
+}
+
+void valor(int *anoAtual) //parte da Lohana em arquivos e da amanda em passagem de parametros
+{
+    int i,anoVenc,atual;
+    atual=*anoAtual;
+    arquivo=fopen("teste","rb");
+    if(arquivo==NULL)
+    {
+        printf("ocorreu um erro");
+        exit(1);
+    }
+    else
+    {
+
+
+         for (i=0; i<3; i++)
+         { //se for pesquisar somente na habilitacao utilize no lugar do i indice hab verificar se ha registo na estrutura a ser
+              fread(CadCond,sizeof(struct CadCond ),3,arquivo);
+              anoVenc = atoi(CadCond[i].DataVenc);
+
+          }
+
+            if (anoVenc < atual)
+                printf("Veiculo em atraso\n");
+            else
+                printf("Veiculo Quitado\n");
+    }
+ fclose(arquivo);
+  }
+
+
+
+void idplaca(){//parte da amanda em arquivos
+    int i;
+
+    arquivo=fopen("teste","rb");
+    if (!arquivo)
+    {
+
+        printf("Nao foi possivel abrir o arquivo!\n\n");
+        exit(1);
+    }
+     else
+     {
+        printf("Arquivo aberto com sucesso!\n\n");
+         for (i=0; i<3; i++)
+         {
+            fread(&CadCond[i],sizeof(struct CadCond),3,arquivo);
+
+
+
+         }
+           if( strcmp (CadCond[i].cidade , CadCond[i].estacionamento.CidadeEst)!=0){
+
+           printf("Numero da placa %s nome do condutor %s", CadCond[i].veiculos.Placa,CadCond[i].nome);
+
+
+             }else
+             {
+               printf("os condutores sao de cidades de mesma localidades");
+
+             }
+
+
+
+     }
+      fclose(arquivo);
+}
+
+int verhabven(int anoAtual){ //parte da Lohana em arquivos e passagem de parametros
+    int anoVenc, i;
+
+ if((arquivo=fopen("teste","rb"))==NULL){
+
+    printf("erro ao abrir arquivo\n");
+    exit(1);
+  }
+    else
+    {
+
+        printf("nao ocorreu erro durante a abertura do arquivo\n\n");
+        fread(&CadCond,sizeof(struct CadCond),3,arquivo);
+        for (i=0; i<3; i++){
+            anoVenc = atoi(CadCond[i].DataVenc);
+        if( anoVenc > anoAtual){
+                printf("Status Regular: \n");
+                printf("Nome do condutor:%s \n", CadCond[i].nome);
+                printf("CPF: %d \n", CadCond[i].cpf);
+                printf("numero da habilitacao %d \n\n", CadCond[i].num);
+            }
+            else{
+                printf("Status Irregular: \n");
+                printf("Nome do condutor:%s \n", CadCond[i].nome);
+                printf("CPF: %d \n", CadCond[i].cpf);
+                printf("numero da habilitacao %d \n\n", CadCond[i].num);
+            }
+
+
+        }
+
+
+
+    }
+ fclose(arquivo);
+system ("PAUSE");
+return 0;
+}
